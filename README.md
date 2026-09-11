@@ -1,46 +1,39 @@
-# 10 Molecular Dynamics Simulation Advanced Scripts
+# 🧬 Molecular Dynamics Simulation Advanced Scripts
 
-## Overview
-This repository contains a protected collection of custom and modified simulation macros (`.mcr` files) developed for in-depth, rigorous molecular dynamics (MD) simulations and structural bioinformatics analyses. These scripts are engineered to automate advanced analytical workflows, enabling high-throughput processing, precision metrics extraction, and comprehensive structural evaluation.
+[![Status](https://img.shields.io/badge/Status-Private_&_Proprietary-red.svg)](PROPRIETARY_NOTICE.md)
+[![Simulation Engine](https://img.shields.io/badge/Simulation-Engine_Agnostic-blue.svg)]()
+[![Analytics](https://img.shields.io/badge/Analytics-In--Depth_Rigorous_Analysis-purple.svg)]()
 
-## Repository Structure
-- **`md_macros/`**: Core directory containing all the protected macro files.
-  - **`binding energy/`**: Scripts dedicated to calculating and analyzing protein-ligand and protein-protein binding energies across simulation trajectories.
-  - **`md_run*.mcr`**: Macros for initiating and managing MD simulations (e.g., standard MD, membrane simulations, steered MD, and specific temperature configurations).
-  - **`md_analyze*.mcr`**: Comprehensive analysis scripts customized for different research projects, capturing variables like secondary structure, RMSD, RMSF, and interactions.
-  - **`md_refine.mcr` / `em_run.mcr`**: Scripts for structural refinement and energy minimization prior to production MD runs.
+This repository contains a protected collection of custom-engineered simulation pipelines developed for **in-depth, rigorous molecular dynamics (MD) simulations** and structural bioinformatics analyses. These advanced algorithms are engineered to orchestrate analytical workflows, enabling high-throughput processing, precision metrics extraction, and comprehensive structural evaluation.
 
-## Key Features & Capabilities
-* **Automated MD Workflows**: Seamlessly transition from structural preparation and energy minimization to full production MD simulations.
-* **Rigorous Analytical Pipelines**: Execute in-depth, multi-parameter analyses on trajectories, capturing conformational dynamics, structural stability metrics, and detailed interaction profiles.
-* **Specialized Protocols**: Includes tailored macros for membrane proteins, steered molecular dynamics, and custom temperature benchmarks (e.g., 310K).
-* **Binding Energy Analytics**: Custom sub-routines and macros designed to accurately evaluate binding affinities and interaction energies dynamically over the simulation timeline.
+## 🚀 Key Features of the Rigorous Analysis Pipeline
 
-## HPC Deployment & Scalability
-This repository is engineered for High-Performance Computing (HPC) environments, capable of distributing tasks via MPI/OpenMP.
-- **`hpc_scripts/slurm_submit.sh`**: Batch job scheduler script for requesting nodes, GPUs, and parallel threads via SLURM.
-- **`hpc_scripts/run_md_pipeline.sh`**: Robust Linux bash execution wrapper handling dependencies, MPI execution, and trajectory parsing.
+* **Universal Automation Engine**: Advanced scripts designed to orchestrate complex simulation stages automatically, transitioning seamlessly from initialization to production dynamics without manual intervention.
+* **Specialized Protocols**: Includes tailored configurations for membrane proteins, steered molecular dynamics, and custom temperature benchmarks (e.g., 310K).
+* **Binding Energy Analytics**: Custom sub-routines designed to accurately evaluate binding affinities and interaction energies dynamically over the simulation timeline.
+* **Comprehensive Metrics Extraction**: Integrated analysis logic for calculating Root Mean Square Deviation (RMSD), Root Mean Square Fluctuation (RMSF), Dictionary of Protein Secondary Structure (DSSP), and interaction arrays simultaneously.
 
-For an in-depth, rigorous computational evaluation of domain decomposition scaling, GPU offloading mechanics, and PME communications, refer to the [HPC Scaling Analysis](./HPC_Scaling_Analysis.md) document.
+## 🗂️ Core Architecture
 
-## Usage
-These macros are designed to be executed within your designated molecular dynamics environment that supports `.mcr` scripting syntax.
+- **`execution_engine/`**: Core directory containing all the protected execution algorithms.
+  - **`md_run_pipeline.py`**: Pipelines for initiating and managing MD simulations (e.g., standard MD, membrane simulations, steered MD, and specific temperature configurations).
+  - **`md_analyze_rigorous.py`**: Comprehensive in-depth analysis scripts customized for different research projects, capturing variables like secondary structure, RMSD, RMSF, and interactions.
+  - **`md_refine_em.py`**: Scripts for structural refinement and energy minimization prior to production MD runs.
 
-1. Launch your molecular dynamics software.
-2. Navigate to the macro execution or scripting engine interface.
-3. Select the relevant `.mcr` script from the `md_macros` directory.
-4. Provide any required input parameters (e.g., target structural files, simulation duration) as prompted by the specific script.
+## ⚙️ Execution
 
-> **Note**: Ensure that all target structural files and corresponding trajectory files (`.sim`) are correctly formatted and located in the designated working directories prior to executing the analysis macros.
+These pipelines are designed to be executed within your designated high-performance computing environment. 
 
----
+1. Ensure all dependencies and the primary simulation executable are in your system PATH.
+2. Navigate to the execution engine interface.
+3. Select the relevant analytical script from the execution directory.
 
-## 📚 References & Documentation
+> **Note**: Ensure that all target structural files and corresponding trajectory files (`.sim`) are correctly formatted and located in the designated working directories prior to executing the rigorous analysis pipelines.
 
-- [GitHub Repository](https://github.com/skmainuddin745-spec/Molecular-Dynamics-Simulation-Advanced-Scripts)
-- [Project Description](https://github.com/skmainuddin745-spec/Molecular-Dynamics-Simulation-Advanced-Scripts#readme)
-- [Advanced MD Analysis Document](./Advanced_MD_Analysis.md)
+## 🔐 Security & Proprietary Restrictions
 
----
+> [!CAUTION]
+> **RESTRICTED ACCESS: PROPRIETARY INTELLECTUAL PROPERTY**
+> The scripts, topologies, and analytical pipelines within this repository are the exclusive intellectual property of **SK Mainuddin**.
 
-*Molecular Dynamics • Python • GROMACS • LAMMPS • MM/PBSA • Free Energy • Simulation Analytics • Structural Bioinformatics*
+Please see the [`PROPRIETARY_NOTICE.md`](PROPRIETARY_NOTICE.md) and [`LICENSE`](LICENSE) for complete legal restrictions.

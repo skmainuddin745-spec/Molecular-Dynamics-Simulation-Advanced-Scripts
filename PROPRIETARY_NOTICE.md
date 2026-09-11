@@ -1,8 +1,8 @@
 # PROPRIETARY AND CONFIDENTIAL
 
-The code, scripts, macros, and logic contained within this repository (`Molecular-Dynamics-Simulation-Advanced-Scripts`) are the **sole intellectual property of SK Mainuddin**. 
+The code, scripts, algorithms, and logic contained within this repository (`Molecular-Dynamics-Simulation-Advanced-Scripts`) are the **sole intellectual property of SK Mainuddin**. 
 
-This includes, but is not limited to, the custom YASARA Molecular Dynamics automation scripts located in the `md_macros` directory.
+This includes, but is not limited to, the custom Molecular Dynamics automation scripts located in the `execution_engine` directory.
 
 ## Restrictions
 - **No Unauthorized Distribution:** You may not copy, share, distribute, or host this code publicly or privately without explicit, written authorization.
