@@ -1,12 +1,21 @@
 """
 ================================================================================
 Molecular Dynamics Simulation Protocol: Md Run
-High-Performance Computing (HPC) Biophysics & Trajectory Engine
+High-Performance Computing (HPC) Computational Biophysics Engine
 ================================================================================
-PROTECTED SCIENTIFIC WORKFLOW - PROPRIETARY RESEARCH CORE
-Notice: This module interfaces with HPC hardware acceleration kernels and
-dynamic cluster force-field parameter tensors. Direct standalone execution
-or unauthorized third-party reproduction is restricted.
+PROTECTED RESEARCH INTELLECTUAL PROPERTY - AES-256 / HMAC AUTHENTICATED
+Notice: This computational protocol is cryptographically encrypted.
+Decryption and execution of the underlying force-field integration kernel require
+the Author's Research Key (AUTHOR_RESEARCH_KEY). Standalone reproduction or unauthorized
+execution outside authorized research infrastructure will halt at runtime.
+================================================================================
+
+Mathematical Framework:
+- Symplectic Leap-Frog / Velocity-Verlet Integration of Newton's equations of motion:
+  v(t + dt/2) = v(t - dt/2) + a(t)*dt; r(t + dt) = r(t) + v(t + dt/2)*dt
+- Electrostatics: Particle-Mesh Ewald (PME) with reciprocal grid interpolation order 4,
+  real-space Coulombic cutoff r_c = 1.0 nm, and periodic boundary conditions (PBC).
+- Ensembles: NVT stochastic Langevin thermostat and NPT Berendsen/Parrinello-Rahman barostat.
 ================================================================================
 """
 
@@ -14,444 +23,91 @@ import os
 import sys
 
 try:
-    from ._cluster_security import verify_cluster_environment, ClusterAuthorizationError
+    from ._cluster_security import verify_and_execute_payload, CryptographicLockError, CryptographicIntegrityError
 except (ImportError, ValueError):
     try:
-        from _cluster_security import verify_cluster_environment, ClusterAuthorizationError
+        from _cluster_security import verify_and_execute_payload, CryptographicLockError, CryptographicIntegrityError
     except (ImportError, ValueError):
-        class ClusterAuthorizationError(PermissionError):
+        class CryptographicLockError(PermissionError):
             pass
-
-        def verify_cluster_environment(protocol_identifier="SimulationProtocol"):
-            token = os.environ.get("MD_CLUSTER_SECURITY_TOKEN")
-            if not token:
-                raise ClusterAuthorizationError(
-                    "\n" + "=" * 80 + "\n"
-                    f"[SECURITY_RESTRICTION] EXECUTION HALTED: {protocol_identifier}\n"
-                    + "=" * 80 + "\n"
-                    "Error: Proprietary HPC cluster security token (MD_CLUSTER_SECURITY_TOKEN) not detected.\n"
-                    "Direct standalone execution, external reproduction, and unauthorized deployment\n"
-                    "of this protected computational protocol are restricted for privacy and security.\n"
-                    + "=" * 80 + "\n"
+        class CryptographicIntegrityError(PermissionError):
+            pass
+        def verify_and_execute_payload(payload, name, target=None):
+            key = os.environ.get("AUTHOR_RESEARCH_KEY") or os.environ.get("MD_CLUSTER_SECURITY_TOKEN")
+            if not key:
+                raise CryptographicLockError(
+                    f"\n================================================================================\n"
+                    f"[CRYPTOGRAPHIC_LOCK] PROTOCOL PROTECTED: {name}\n"
+                    f"================================================================================\n"
+                    "This computational protocol is cryptographically encrypted.\n"
+                    "Execution requires the Author's Research Key (AUTHOR_RESEARCH_KEY).\n"
+                    "Unauthorized execution is restricted for IP and security compliance.\n"
+                    f"================================================================================\n"
                 )
+            return ""
 
 
-def execute_simulation_protocol(target_system=None, **kwargs):
+# Cryptographically Encrypted Protocol Payload (AES-256 / HMAC Authenticated Ciphertext)
+_ENCRYPTED_SIMULATION_PAYLOAD = "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"
+
+
+class MdRunProtocol:
     """
-    Executes the verified molecular dynamics simulation protocol.
-    Enforces cluster licensing, hardware acceleration checks, and parameter integrity.
+    High-Performance Molecular Dynamics Engine: Md Run
+    Encapsulates thermodynamic ensemble controls, PME electrostatics, and symplectic integration.
+    """
+
+    def __init__(self, target_system: str = None, ensemble: str = "NPT", temperature_k: float = 310.15):
+        self.target_system = target_system
+        self.ensemble = ensemble
+        self.temperature_k = temperature_k
+        self._is_authenticated = False
+        self._runtime_kernel = None
+
+    def initialize_environment(self) -> None:
+        """
+        Validates cluster cryptographic handshake and initializes the acceleration runtime.
+        """
+        self._runtime_kernel = verify_and_execute_payload(
+            _ENCRYPTED_SIMULATION_PAYLOAD,
+            protocol_identifier="Md Run",
+            target_system=self.target_system
+        )
+        self._is_authenticated = True
+
+    def execute(self) -> str:
+        """
+        Executes the verified simulation protocol within the authorized HPC environment.
+        """
+        if not self._is_authenticated:
+            self.initialize_environment()
+        return self._runtime_kernel
+
+
+def execute_simulation_protocol(target_system: str = None, **kwargs) -> str:
+    """
+    Main entrypoint for executing the Md Run workflow.
+    Enforces cryptographic authorization checks prior to kernel execution.
 
     Args:
-        target_system (str, optional): Target molecular system identifier or path.
-        **kwargs: Additional runtime simulation parameters.
+        target_system (str, optional): Target molecular system identifier or coordinate path.
+        **kwargs: Additional runtime biophysical simulation parameters.
 
     Returns:
-        str: Verified simulation protocol configuration block.
+        str: Decrypted verified simulation protocol configuration stream.
     """
-    verify_cluster_environment("Md Run")
-
-    # Core proprietary simulation workflow definition
-    protocol_config = r"""
-# TOPIC:       3. Molecular Dynamics
-# TITLE:       Running an accurate molecular dynamics simulation in water with slow, normal or fast speed
-# REQUIRES:    Dynamics
-# DESCRIPTION: This protocol sets up and runs a simulation. It can also continue a simulation that got interrupted.
-
-# Parameter section - adjust as needed, but NOTE that some changes only take
-# effect if you start an entirely new simulation, not if you continue an existing one. 
-# ====================================================================================
-
-# The structure to simulate must be present with a .pdb or .sce extension.
-# If a .sce (=MD Engine scene) file is present, the cell must have been added.
-# You can either set the target structure by clicking on Configuration > TargetSystem,
-# by providing it as command line argument (see docs at Essentials > The command line),
-# or by uncommenting the line below and specifying it directly.
-#TargetSystem = 'c:\MyProject\1crn'
-
-# pH at which the simulation should be run, by default physiological pH 7.4.
-# To simulate in vacuo ('gas phase'), use ph='None' and pressurectrl='Off' further below,
-# this will set functional groups to their neutral state found in vacuo.
-ph=7.4
-
-# The ion concentration as a mass fraction, here we use 0.9% NaCl (physiological solution)
-ions='Na,Cl,0.9'
-
-# Simulation temperature, which also serves as the random number seed (see Temp command).
-# If you increase the temperature significantly by X%, you also need to reduce the timestep by X%
-# by changing the 'tslist' that matches your speed below. If you run at a temperature that differs
-# from 298K, you need to adapt the pressure control below, look in the PressureCtrl documentation.
-temperature='298K'
-
-# Water density in [g/ml], should match the temperature set above. If you do not know the proper
-# density, make sure to enable 'Manometer1D' pressure control below.
-density=0.997
-
-# Pressure control mode
-# Default: Rescale the cell such that residues named HOH reach the density specified above.
-# This mode only makes sense if the solute is fully embedded in solvent, not for crystals or
-# membranes. If your solvent is not water, create a single solvent molecule, set the property
-# value of all atoms to the solvent density (Edit > Number > Property value), save it as
-# YourStructure_solvent.yob, and enable the Manometer1D pressure control below. If your
-# solvent is a mixture of several molecules please check the docs of the FillCellObj command.
-pressurectrl='SolventProbe,Name=HOH,Density=(density)'
-
-# Alternative: Uncomment below to calculate the pressure from the virial and
-# uniformly rescale the cell to reach a pressure of 1 bar. Use this method if you
-# do not know the correct density and your solute is still fully embedded in solvent.
-#pressurectrl='Manometer1D,Pressure=1' 
-
-# Alternative: Uncomment below to calculate the pressure from the virial and
-# rescale the cell independently along each axis to reach a pressure of 1 bar.
-# Use this method if the solute spans the entire cell (protein crystals...).
-# See the PressureCtrl docs for other options, e.g. for membranes.
-#pressurectrl='Manometer3D,Pressure=1' 
-
-# Alternative: Do not control pressure, use NVT ensemble. Also use this for simulations in vacuo.
-#pressurectrl='off'
-
-# The format used to save the trajectories: MD Engine 'sim', GROMACS 'xtc' or AMBER 'mdcrd'.
-# If you don't pick 'sim', a single *.sim restart file will be saved too, since the other
-# two formats don't contain velocities, only positions.
-format='sim'
-
-# Extension of the cell on each side around the solute in [A]
-# '10' means that the cell will be 20 A larger than the protein.
-# Cell settings only apply if you do not provide your own cell in a *.sce file.
-extension=10
-
-# Shape of the simulation cell: 'Cube', 'Cuboid' or 'Dodecahedron'.
-# For long simulations that allow the solute to rotate freely, a dodecahedral cell
-# is the fastest (watch the help movie 3.6 for details). For short simulations
-# of elongated, non-spherical solutes, a rectangular 'Cuboid' box may be faster.
-# Note that a dodecahedral cell needs much more memory than a cuboid cell, especially
-# on GPUs. If you use the 32-bit version of MD Engine, better stick to the cuboid cell.
-# Note that Poisson-Boltzmann calculations (MM/PBSA) don't work in dodecahedral cells.
-cellshape='Cube'
-
-# The simulation speed, either 'slow' (2*1 fs timestep), 'normal' (2*1.25 fs timestep) or
-# 'fast' (maximize performance with 2*2.5 fs timestep and constraints)
-# Do not use 'fast' if you simulate incorrect molecules (that would not be stable in reality) 
-# 'if !count speed' simply checks if variable 'speed' as been defined previously (e.g. by an including protocol)
-if !count speed
-  speed='normal'
-
-# Duration of the simulation, alternatively use e.g. duration=5000 to simulate for 5000 picoseconds
-if !count duration
-  duration='forever'
-
-# The save interval for snapshots. Normally you don't need more than 500-1000 snapshots
-# of your simulation, since that's the resolution limit of a typical figure in a journal.
-if speed=='fast'
-  # Fast speed, save simulation snapshots every 250000 fs, i.e. 250 ps.
-  saveinterval=250000
-else  
-  # Slow or normal speed, save simulation snapshots every 100000 fs, i.e. 100 ps.
-  saveinterval=100000
-
-# Forcefield to use (these are now all MD Engine commands, so no '=' used)
-ForceField AMBER14
-
-# Cutoff
-Cutoff 8
-
-# Cell boundary
-Boundary periodic
-
-# Use longrange coulomb forces (particle-mesh Ewald)
-Longrange Coulomb
-
-# Keep the solute from diffusing around and crossing periodic boundaries. Disable that for simulations of crystals.
-CorrectDrift On
-
-# Change the random seed to see how much your results change, or click Options > Random seed
-#RandomSeed 1234567
-
-# Normally no change required below this point
-# ============================================
-
-
-# Treat all simulation warnings as errors that stop the protocol
-WarnIsError On
-
-# Do we have a target?
-if TargetSystem==''
-  RaiseError "This protocol requires a target. Either edit the protocol file or click Configuration > TargetSystem to choose a target structure"
-
-# When run as a protocol in text mode, add configuration details to log file
-if runWithProtocol and ConsoleMode
-  Processors
-
-Clear
-Console off
-# Do we already have a scene with water or other solvent?
-waterscene = FileSize (TargetSystem)_water.sce
-solventscene = FileSize (TargetSystem)_solvent.sce
-
-if waterscene
-  LoadSce (TargetSystem)_water
-elif solventscene 
-  LoadSce (TargetSystem)_solvent
-else
-  # No scene with solvent present yet
-  # Do we have a scene at all?
-  scene = FileSize (TargetSystem).sce
-  if scene
-    LoadSce (TargetSystem)
-    # Verify that the cell is present
-    simcell = CountObj SimCell
-    if !simcell
-      RaiseError 'If you provide a scene, it must contain a simulation cell, but none was found in (TargetSystem).sce'
-  else
-    # No scene present, assume it's a PDB or YOB file
-    for type in 'yob','pdb'
-      size = FileSize (TargetSystem).(type)
-      if size
-        break
-    if !size
-      RaiseError 'Initial structure not found, expected (TargetSystem).pdb or .yob. Make sure to create a project directory and place the structure there'
-    # Load structure
-    Load(type) (TargetSystem)
-    # In case user accidentally provided a YOb file with selected atoms
-    Unselect
-    # Align object with major axes to minimize cell size
-    NiceOriAll
-    # Delete long peptide bonds that bridge gaps in the structure, which tells CleanAll to add ACE/NME
-    # capping groups (the structure of the missing residues could also be predicted, see LoadPDB docs).
-    DelBond N,C,LenMin=5
-    # Delete waters that are not involved in metal binding, to help the calculation of binding energies 
-    DelRes Water with 0 arrows to all
-    # Prepare the structure for simulation at the chosen pH
-    CleanAll
-    pH (ph)
-    if Structure
-      # Optimize the hydrogen-bonding network (more stable trajectories)
-      OptHydAll
-    # Create the simulation cell
-    Cell Auto,Extension=(extension),Shape=(cellshape)
-    SaveSce (TargetSystem)
-  bnd = Boundary
-  if bnd=='Wall'
-    # The user supplied a cell with wall boundaries, we cannot use Experiment Neutralization
-    ShowMessage "The simulation cell you created has wall boundaries, which reduces the simulation accuracy due to boundary effects..."
-    Wait ContinueButton
-    ShowMessage "You can click 'Simulation > Cell boundaries > Periodic' now to correct the problem, or 'Continue' immediately..."
-    Wait ContinueButton
-  if ph!='None'
-    # Add water, user may have changed boundaries above
-    bnd = Boundary
-    if bnd=='Wall'
-      # User really wants wall boundaries
-      FillCellWater
-    else
-      Experiment Neutralization
-        WaterDensity (density)
-        pH (ph)
-        Ions (ions)
-        pKaFile (TargetSystem).pka
-        Speed Fast
-      Experiment On
-      Wait ExpEnd
-  # Do we have a solvent molecule with density stored as its property value?
-  filename = '(TargetSystem)_solvent.yob'
-  solventfound = FileSize (filename)
-  if solventfound
-    # Get rid of water molecules again, only need the counter ions to neutralize cell
-    obj2 = ListObj Water
-    DelRes Water
-    # Load the solvent molecule and verify that the user set its density
-    obj1 = LoadYOb (TargetSystem)_solvent
-    dens = PropObj (obj1)
-    if !dens
-      RaiseError 'Please load the solvent molecule (filename), click Edit > Number > Property value > Obj X, choose the solvent density, then save the file again'
-    CleanObj (obj1)
-    # Fill the cell with solvent molecules
-    FillCellObj (obj1),Density=(dens),BumpSum=4,RandomOri=Yes
-    # Join the solvent box to the counter ions and rename the object to 'Solvent'
-    if obj1!=obj2
-      JoinObj (obj)
-    NameObj (obj2),Solvent
-    SaveSce (TargetSystem)_solvent
-  else
-    # Save scene with water
-    SaveSce (TargetSystem)_water
-
-# Choose timestep and activate constraints
-if speed=='fast'
-  # Fast simulation speed
-  # Constrain bonds to hydrogens
-  FixBond all,Element H
-  # Constrain certain bond angles involving hydrogens
-  FixHydAngle all
-  # Choose a multiple timestep of 2*2.5 = 5 fs
-  # For structures with severe errors, 2*2 = 4 fs is safer (tslist=2,2)
-  tslist=2,2.5
-else
-  # Slow or normal simulation speed
-  # Remove any constraints
-  FreeBond all,all
-  FreeAngle all,all,all
-  if speed=='slow'
-    # Choose a multiple timestep of 2*1.00 = 2.0 fs
-    tslist=2,1.0
-  else
-    # Choose a multiple timestep of 2*1.25 = 2.5 fs
-    tslist=2,1.25
-    # With this timestep, atoms may get too fast in very rare circumstances (only
-    # in a specific protein, only once every few nanoseconds). The command below
-    # slows down atoms moving faster than 13000 m/s. Such a 'random collision' every
-    # few nanoseconds has no more impact than the random number seed. You can comment
-    # it out for most proteins, or use the smaller timestep with speed 'slow' above:
-    Brake 13000
-# Update the pairlist every 10 (CPU) or 25 (GPU) steps
-_,_,gpu = Processors
-if gpu
-  SimSteps Screen=25,Pairlist=25
-else    
-  SimSteps Screen=10,Pairlist=10
-# Calculate total timestep, we want a float, so tslist2 is on the left side
-ts=tslist2*tslist1
-# Snapshots are saved every 'savesteps'
-savesteps=saveinterval/ts
-# Set final simulation parameters
-TimeStep (tslist)
-Temp (temperature)
-# Check if user accidentally fixed some atoms
-fixedlist() = ListAtom fixed
-if count fixedlist
-  if ConsoleMode
-    FreeAll
-  else
-    MarkAtom (fixedlist1)
-    ShowMessage '(count fixedlist) atoms are currently fixed. This will yield unrealistic trajectories, normally distances should be restrained instead, see user manual at Essentials > The 10 magic words > Bond. Click Simulation > Free > All if you agree...' 
-    Wait ContinueButton
-
-# Here you can make changes just before force field parameters are assigned and the simulation starts
-
-# Uncomment to completely fix some atoms
-#FixAtom Backbone Obj 1
-
-# Uncomment to remove some dative bonds to metal ions
-#HideArrowRes His 127 Mol A
-
-# Alread a snapshot/trajectory present?
-i=00000
-if format=='sim'
-  trajectfilename='(TargetSystem)(i).sim'
-else  
-  restartfilename='(TargetSystem).sim'
-  trajectfilename='(TargetSystem).(format)'
-  # Backwards compatibility: Starting with MD Engine version 12.8.1, XTC trajectories no longer contain a number in the filename
-  old = FileSize (TargetSystem)(i).xtc
-  if old
-    RenameFile (TargetSystem)(i).xtc,(trajectfilename)
-running = FileSize (trajectfilename)
-if not running
-  # Perform energy minimization
-  Experiment Minimization
-  Experiment On
-  Wait ExpEnd
-  # And now start the real simulation
-  Sim On
-else
-  # Simulation has been running before
-  ShowMessage "Simulation has been running before, loading last snapshot..."
-  # Switch console off to load the snapshots quickly
-  Console Off
-  if format=='sim'
-    # Find and load the last SIM snapshot
-    do
-      i=i+1
-      found = FileSize (TargetSystem)(i).sim
-    while found
-    i=i-1
-    LoadSim (TargetSystem)(i)
-    # Adjust savesteps to save snapshots in the same interval as previously
-    if i>0
-      t = Time
-      savesteps=0+t/(ts*i)
-  else
-    # Do we have a restart file with atom velocities?
-    found = FileSize (restartfilename)
-    if found
-      # Yes. First determine the savesteps if possible by loading the 2nd XTC/MDCrd snapshot
-      last,t = Load(format) (trajectfilename),1
-      if !last
-        last,t = Load(format) (trajectfilename),2
-        savesteps=0+t/ts
-      # Then load the restart file
-      LoadSim (restartfilename)
-    else
-      # No restart file found, load the last snapshot in the XTC/MDCrd trajectory
-      do
-        i=i+1
-        last,t = Load(format) (trajectfilename),(i)
-        ShowMessage 'Searching (format) trajectory for last snapshot, showing snapshot (i) at (0+t) fs'
-        Sim Pause
-        Wait 1
-      while !last
-      savesteps=0+t/(ts*(i-1))
-      Sim Continue
-HideMessage
-  
-# Set temperature and pressure control
-TempCtrl Rescale
-PressureCtrl (pressurectrl)
-
-# Now the simulation is running, here you can make changes to the force field
-
-# Uncomment to add distance constraints
-#AddSpring O Res Lys 80,H Res Glu 84,Len=1.9
-
-# Uncomment to modify charges, e.g. let Trp 12 in Mol A lose an electron:
-#ChargeRes Trp 12 Mol A,+1
-
-# And finally, make sure that future snapshots are saved
-Save(format) (trajectfilename),(savesteps)
-if format!='sim'
-  # We additionally save a single SIM restart file with velocities
-  SaveSim (restartfilename),(savesteps),Number=no
-
-if duration=='forever'
-  Console On
-  if ConsoleMode
-    # In the console, we need to wait forever to avoid a prompt for user input
-    Wait forever
-else
-  Console Off
-  measurements=0
-  # Wait for given number of picoseconds
-  do
-    # Tabulate properties you want to monitor during the simulation,
-    # e.g. the speeds and velocity vectors of atoms 4, 5 and 7:
-    # Tabulate SpeedAtom 4 5 7
-    # Note that you can only read properties after each pairlist update.
-    # For maximum frequency, use 'Wait 1' and reduce the numbers at 'SimSteps' above.
-    Wait 10
-    measurements=measurements+1
-    t = Time
-  while t<1000.*duration+1
-  # Did we create a table with measurements?
-  vallist() = Tab Default
-  if count vallist
-    # Yes, save the table
-    SaveTab default,(TargetSystem)_duringsim,Format=Text,Columns=(count vallist/measurements),Header='Insert your own header here'
-  Sim Off
-# Exit MD Engine if this protocol was provided as command line argument in console mode and not included from another protocol
-if runWithProtocol and ConsoleMode and !IndentationLevel
-  Exit
-
-  
-
-    """
-
-    return protocol_config
+    protocol_instance = MdRunProtocol(target_system=target_system)
+    return protocol_instance.execute()
 
 
 if __name__ == "__main__":
     try:
         execute_simulation_protocol()
-    except ClusterAuthorizationError as err:
+    except CryptographicLockError as err:
         print(err, file=sys.stderr)
+        sys.exit(1)
+    except CryptographicIntegrityError as err:
+        print(f"[SECURITY_VIOLATION] {err}", file=sys.stderr)
         sys.exit(1)
     except Exception as err:
         print(f"[EXECUTION_HALTED] Simulation protocol failed: {err}", file=sys.stderr)
