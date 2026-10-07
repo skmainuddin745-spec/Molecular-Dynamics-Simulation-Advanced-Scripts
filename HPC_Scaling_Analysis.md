@@ -27,7 +27,7 @@ When scaling beyond a single node, the simulation box is physically divided into
 While the MD integration timestep is bounded by strong scaling, the post-simulation analytics - specifically the MM/PBSA binding free energy evaluation - exhibits **embarrassing parallelism** (perfect weak scaling).
 
 ### 4.1 Frame-by-Frame Independence
-The macro `md_analyzebindenergy.py` evaluates individual trajectory frames independently:
+The protocol module `md_analyzebindenergy.py` evaluates individual trajectory frames independently:
 $$ \Delta G_{\text{bind}} = G_{\text{complex}} - (G_{\text{protein}} + G_{\text{ligand}}) $$
 Where the solvation terms (Polar/Poisson-Boltzmann and Non-polar/SASA) are solved iteratively. 
 - **HPC Implementation**: Because each frame does not depend on the previous state, the bash wrapper allows the trajectory to be chunked into disparate SLURM arrays, bypassing Amdahl's Law and achieving $\approx 99\%$ parallel efficiency across hundreds of compute nodes.

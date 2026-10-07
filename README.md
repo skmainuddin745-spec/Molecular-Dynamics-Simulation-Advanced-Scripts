@@ -1,46 +1,46 @@
-# 10 Molecular Dynamics Simulation Advanced Scripts
+# Molecular Dynamics Simulation Advanced Protocols & HPC Pipelines
 
 ## Overview
-This repository contains a protected collection of custom and modified simulation macros (`.mcr` files) developed for in-depth, rigorous molecular dynamics (MD) simulations and structural bioinformatics analyses. These scripts are engineered to automate advanced analytical workflows, enabling high-throughput processing, precision metrics extraction, and comprehensive structural evaluation.
+This repository contains a protected suite of advanced Molecular Dynamics (MD) simulation protocols, High-Performance Computing (HPC) pipelines, and structural bioinformatics analytics engines. The protocols automate multi-stage computational biophysics workflows, enabling high-throughput trajectory sampling, thermodynamic ensemble equilibration, precision free energy evaluation, and correlated dynamics extraction.
 
-## Repository Structure
-- **`md_macros/`**: Core directory containing all the protected macro files.
-  - **`binding energy/`**: Scripts dedicated to calculating and analyzing protein-ligand and protein-protein binding energies across simulation trajectories.
-  - **`md_run*.mcr`**: Macros for initiating and managing MD simulations (e.g., standard MD, membrane simulations, steered MD, and specific temperature configurations).
-  - **`md_analyze*.mcr`**: Comprehensive analysis scripts customized for different research projects, capturing variables like secondary structure, RMSD, RMSF, and interactions.
-  - **`md_refine.mcr` / `em_run.mcr`**: Scripts for structural refinement and energy minimization prior to production MD runs.
+## Repository Architecture
+- **`simulation_protocols/`**: Core directory containing protected computational protocol modules.
+  - **`binding_energy/`**: Sub-directory dedicated to endpoint binding free energy evaluation and continuum solvation modeling across trajectory ensembles.
+  - **`md_run*.py`**: Comprehensive simulation engines governing system equilibration and production MD (e.g., standard NPT/NVT, physiological 310.15 K, lipid bilayer membrane self-assembly, steered pulling MD, and accelerated timesteps).
+  - **`md_analyze*.py`**: High-throughput trajectory analytics extracting RMSD, RMSF, radius of gyration, dynamic cross-correlation matrices (DCCM), and secondary structure transitions.
+  - **`em_run*.py` & `md_refine.py`**: Steepest descent / conjugate gradient energy minimization, hydrogen bonding network optimization, and simulated annealing refinement.
+  - **`_cluster_security.py`**: HPC cluster authentication, hardware acceleration verification, and intellectual property protection guard layer.
+- **`hpc_scripts/`**: Enterprise HPC cluster orchestration scripts.
+  - **`slurm_submit.sh`**: SLURM batch scheduler submission requesting multi-GPU acceleration, MPI tasks, and OpenMP thread pinning.
+  - **`run_md_pipeline.sh`**: Robust Linux bash execution wrapper managing dependencies, process monitoring, and pipeline stages.
 
-## Key Features & Capabilities
-* **Automated MD Workflows**: Seamlessly transition from structural preparation and energy minimization to full production MD simulations.
-* **Rigorous Analytical Pipelines**: Execute in-depth, multi-parameter analyses on trajectories, capturing conformational dynamics, structural stability metrics, and detailed interaction profiles.
-* **Specialized Protocols**: Includes tailored macros for membrane proteins, steered molecular dynamics, and custom temperature benchmarks (e.g., 310K).
-* **Binding Energy Analytics**: Custom sub-routines and macros designed to accurately evaluate binding affinities and interaction energies dynamically over the simulation timeline.
+## Key Biophysical Capabilities
+* **Hierarchical Multi-Timestep Integration**: Fast-varying force decomposition extending timesteps up to 5.0 fs via rigid bond constraints (SHAKE/LINCS equivalents).
+* **Long-Range Electrostatics**: Particle-Mesh Ewald (PME) reciprocal grid space resolution with strict Periodic Boundary Conditions (PBC).
+* **Thermodynamic Ensembles**: Stochastic Langevin / velocity-rescaling thermostats (NVT) and isotropic/anisotropic barostats (NPT) for solution and membrane phases.
+* **Binding Free Energy Analytics (MM/PBSA)**: Endpoint free energy decomposition coupling molecular mechanics with Poisson-Boltzmann continuum solvation and non-polar surface area estimations.
 
 ## HPC Deployment & Scalability
-This repository is engineered for High-Performance Computing (HPC) environments, capable of distributing tasks via MPI/OpenMP.
-- **`hpc_scripts/slurm_submit.sh`**: Batch job scheduler script for requesting nodes, GPUs, and parallel threads via SLURM.
-- **`hpc_scripts/run_md_pipeline.sh`**: Robust Linux bash execution wrapper handling dependencies, MPI execution, and trajectory parsing.
+The workflow is engineered for distributed execution across multi-GPU supercomputing clusters:
+- **MPI & OpenMP Hybrid Scaling**: Spatial domain decomposition coupled with intra-node multi-threading to bypass 3D-FFT communication bottlenecks.
+- **GPU Kernel Offloading**: Direct delegation of non-bonded pair potentials (Lennard-Jones and real-space Coulombic) to streaming multiprocessors.
 
-For an in-depth, rigorous computational evaluation of domain decomposition scaling, GPU offloading mechanics, and PME communications, refer to the [HPC Scaling Analysis](./HPC_Scaling_Analysis.md) document.
+For an in-depth theoretical and empirical scaling derivation, see the [HPC Scaling Analysis](./HPC_Scaling_Analysis.md) document.
+For detailed biophysical equations and mathematical foundations, see the [Advanced MD Analysis](./Advanced_MD_Analysis.md) document.
 
-## Usage
-These macros are designed to be executed within your designated molecular dynamics environment that supports `.mcr` scripting syntax.
-
-1. Launch your molecular dynamics software.
-2. Navigate to the macro execution or scripting engine interface.
-3. Select the relevant `.mcr` script from the `md_macros` directory.
-4. Provide any required input parameters (e.g., target structural files, simulation duration) as prompted by the specific script.
-
-> **Note**: Ensure that all target structural files and corresponding trajectory files (`.sim`) are correctly formatted and located in the designated working directories prior to executing the analysis macros.
+## Intellectual Property Protection & Cluster Guard
+> [!NOTE]
+> All simulation protocols in this repository are protected research workflows. To safeguard proprietary potential calibrations and ensure computational reproducibility:
+> - **Cluster Verification**: Protocols verify cluster hardware authorization (`MD_CLUSTER_SECURITY_TOKEN`) and require calibrated potential tensors.
+> - **Execution Guard**: Standalone external execution outside authorized research cluster nodes halts automatically with a descriptive security exception.
+> - **Collaboration Access**: For academic collaboration or access to production binaries and parameter sets, contact the corresponding research laboratory.
 
 ---
 
-## 📚 References & Documentation
-
-- [GitHub Repository](https://github.com/skmainuddin745-spec/Molecular-Dynamics-Simulation-Advanced-Scripts)
-- [Project Description](https://github.com/skmainuddin745-spec/Molecular-Dynamics-Simulation-Advanced-Scripts#readme)
+## References & Documentation
 - [Advanced MD Analysis Document](./Advanced_MD_Analysis.md)
+- [HPC Scaling Analysis Document](./HPC_Scaling_Analysis.md)
+- [Implementation Architecture](./implementation_plan.md)
 
 ---
-
-*Molecular Dynamics • Python • GROMACS • LAMMPS • MM/PBSA • Free Energy • Simulation Analytics • Structural Bioinformatics*
+*Molecular Dynamics • Python • HPC Workflows • GROMACS • LAMMPS • MM/PBSA • Free Energy • Simulation Analytics • Structural Bioinformatics*

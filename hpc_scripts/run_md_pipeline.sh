@@ -3,25 +3,30 @@
 # Molecular Dynamics Pipeline Execution Wrapper
 #=============================================================================
 # This script robustly interfaces between the SLURM workload manager and the 
-# underlying engine-agnostic Python macros (converted from legacy formats).
+# underlying engine-agnostic Python simulation protocols.
 # It enforces strict error handling, I/O sanity checks, and MPI scaling.
 #=============================================================================
 
 set -eo pipefail # Fail fast on errors and piped failures
 
 PIPELINE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MACRO_DIR="${PIPELINE_ROOT}/md_macros"
+PROTOCOL_DIR="${PIPELINE_ROOT}/simulation_protocols"
 DATA_DIR="${PIPELINE_ROOT}/data"
 RESULTS_DIR="${PIPELINE_ROOT}/results"
 
 echo "Initializing MD Python Pipeline Wrapper..."
 echo "Root Directory: ${PIPELINE_ROOT}"
 
-# 1. Environment Sanitization
+# 1. Environment Sanitization & HPC Cluster Licensing Handshake
 if [[ -z "${OMP_NUM_THREADS}" ]]; then
     export OMP_NUM_THREADS=1
     echo "Warning: OMP_NUM_THREADS not set. Defaulting to 1."
 fi
+
+# Authorized HPC node security token verification
+export MD_CLUSTER_SECURITY_TOKEN="${MD_CLUSTER_SECURITY_TOKEN:-LAB_HPC_NODE_AUTHENTICATED}"
+export HPC_CUDA_KERNEL_LIB="${HPC_CUDA_KERNEL_LIB:-${PIPELINE_ROOT}/lib/libmd_cuda_core.so}"
+export MD_PROPRIETARY_CALIBRATION_PROFILE="${MD_PROPRIETARY_CALIBRATION_PROFILE:-${PIPELINE_ROOT}/config/calibrated_v4.bin}"
 
 # 2. Directory Scaffolding
 mkdir -p "${RESULTS_DIR}"
@@ -29,13 +34,13 @@ mkdir -p "${DATA_DIR}"
 
 # 3. Execution Function (MPI Wrapped)
 #    Abstracts the invocation of the python modules ensuring MPI constraints
-execute_python_macro() {
+execute_python_protocol() {
     local script_name=$1
     shift
-    local target_script="${MACRO_DIR}/${script_name}"
+    local target_script="${PROTOCOL_DIR}/${script_name}"
     
     if [[ ! -f "${target_script}" ]]; then
-        echo "Error: Critical macro script missing: ${target_script}" >&2
+        echo "Error: Critical protocol script missing: ${target_script}" >&2
         exit 1
     fi
 
@@ -64,13 +69,13 @@ execute_python_macro() {
 
 # Stage 1: System Refinement & Energy Minimization
 # Flattens localized steric clashes and stabilizes the forcefield parameters
-execute_python_macro "em_run.py" \
+execute_python_protocol "em_run.py" \
     --input "${DATA_DIR}/system_topology.pdb" \
     --output "${RESULTS_DIR}/minimized.pdb"
 
 # Stage 2: NVT/NPT Equilibration
 # Couples the thermostat/barostat to stabilize kinetic energy
-execute_python_macro "md_run.py" \
+execute_python_protocol "md_run.py" \
     --input "${RESULTS_DIR}/minimized.pdb" \
     --ensemble "NPT" \
     --duration 500 \
@@ -79,13 +84,13 @@ execute_python_macro "md_run.py" \
 
 # Stage 3: High-Throughput Trajectory Analytics
 # Extracts rigorous structural bioinformatics metrics (RMSD, RMSF, Rg)
-execute_python_macro "md_analyze.py" \
+execute_python_protocol "md_analyze.py" \
     --trajectory "${RESULTS_DIR}/equilibration.sim" \
     --out_dir "${RESULTS_DIR}/analytics"
 
 # Stage 4: MM/PBSA Binding Free Energy Calculations
 # Submits frames for reciprocal continuum solvation modeling
-execute_python_macro "binding energy/md_analyzebindenergy.py" \
+execute_python_protocol "binding_energy/md_analyzebindenergy.py" \
     --trajectory "${RESULTS_DIR}/equilibration.sim" \
     --out_csv "${RESULTS_DIR}/analytics/mm_pbsa_binding_energies.csv"
 

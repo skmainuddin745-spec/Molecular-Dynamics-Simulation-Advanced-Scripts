@@ -1,0 +1,21 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# MD simulation files & trajectories
+*.sim
+*.xtc
+*.trr
+*.edr
+*.gro
+*.tpr
+*.dcd
+*.nc
+
+# Temporary and scratch files
+scratch/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

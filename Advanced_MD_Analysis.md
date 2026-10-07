@@ -13,7 +13,7 @@ The scripts employ sophisticated multiple-timestep integration algorithms design
 
 ## 2. Boundary Conditions & Electrostatics
 
-Correct modeling of the solvent environment and long-range forces is critical for accurate macromolecular simulations.
+Correct modeling of the solvent environment and long-range forces is critical for accurate biomolecular simulations.
 
 - **Periodic Boundary Conditions (PBC)**: The scripts enforce strict periodic boundaries (`Boundary periodic`) to eliminate edge effects and simulate bulk solvent conditions.
 - **Particle-Mesh Ewald (PME)**: Long-range electrostatic interactions are treated using the Particle-Mesh Ewald method (`Longrange Coulomb`). This ensures accurate calculation of electrostatic forces beyond the typical $8 \text{ \AA}$ cutoff, which is critical for highly charged systems like nucleic acids and lipid bilayers.
@@ -25,7 +25,7 @@ The scripts are configurable to support various thermodynamic ensembles (NVT and
 
 - **Temperature Control (Thermostat)**: Temperature is regulated (e.g., $298 \text{ K}$ or $310 \text{ K}$) using velocity rescaling (`TempCtrl Rescale`) or stochastic collision equivalent thermostats, maintaining the NVT ensemble for initial heating or vacuum simulations.
 - **Pressure Control (Barostat)**: Multiple barostatting mechanisms are supported for NPT ensemble simulations:
-  - *Solvent Probe*: Dynamically rescales the cell such that specific solvent molecules (e.g., water/HOH) reach their target macroscopic density ($0.997 \text{ g/ml}$).
+  - *Solvent Probe*: Dynamically rescales the cell such that specific solvent molecules (e.g., water/HOH) reach their target bulk density ($0.997 \text{ g/ml}$).
   - *Isotropic Manometer 1D*: Uniformly scales the simulation cell based on the internal virial to maintain $1 \text{ bar}$ pressure, equivalent to a Berendsen or Parrinello-Rahman isotropic barostat.
   - *Anisotropic Manometer 3D*: Rescales the cell independently along each Cartesian axis, essential for anisotropic systems like biological membranes or protein crystals.
 
